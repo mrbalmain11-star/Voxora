@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/voxora-android-debug.yml'
+      - 'android/settings.gradle.kts'
+      - 'android/gradle/wrapper/gradle-wrapper.properties'
 jobs:
   build:
     runs-on: ubuntu-latest
