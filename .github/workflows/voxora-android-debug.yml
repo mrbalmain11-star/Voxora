@@ -22,6 +22,19 @@ jobs:
           cache: true
       - name: Flutter diagnostics
         run: flutter --version
+      - name: Exclude development-only tools from debug build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('pubspec.yaml')
+          original = p.read_text()
+          updated, count = re.subn(r'(?ms)^dev_dependencies:\\s*\\n.*?(?=^flutter:\\s*$)', '', original)
+          if count != 1:
+              raise SystemExit('Could not locate dev_dependencies section safely')
+          p.write_text(updated)
+          print('Excluded development dependencies for CI build only')
+          PY
       - name: Install dependencies
         run: flutter pub get
       - name: Build debug APK
