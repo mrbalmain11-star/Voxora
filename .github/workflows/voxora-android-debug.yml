@@ -56,9 +56,9 @@ jobs:
           for path in packages:
               source = path.read_text()
               if path.name.endswith(".kts"):
-                  updated, count = re.subn(r"compileSdk\\s*=\\s*33", "compileSdk = 36", source)
+                  updated, count = re.subn(r"compileSdk\s*=\s*33", "compileSdk = 36", source)
               else:
-                  updated, count = re.subn(r"compileSdkVersion\\s*\\(?\\s*33\\s*\\)?|compileSdk\\s+33", "compileSdkVersion 36", source)
+                  updated, count = re.subn(r"compileSdkVersion\s*\(?\s*33\s*\)?|compileSdk\s+33", "compileSdkVersion 36", source)
               if not count:
                   raise SystemExit(f"Expected compileSdk 33 not found in {path}")
               path.write_text(updated)
