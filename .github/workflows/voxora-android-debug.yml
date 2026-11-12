@@ -1,4 +1,5 @@
 name: Voxora Android Debug APK
+# Trigger fresh build on current main after Kotlin configuration fix
 on:
   workflow_dispatch:
   push:
