@@ -44,25 +44,32 @@ jobs:
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;27.0.11902837"
-      - name: Align animated_rating_stars Android compile SDK
+      - name: Modernize legacy rating stars Android plugin for CI
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import os, re
+          import os
           root = Path(os.environ["HOME"]) / ".pub-cache" / "hosted" / "pub.dev"
-          packages = sorted(root.glob("animated_rating_stars-*/android/build.gradle*"))
-          if not packages:
-              raise SystemExit("animated_rating_stars Android Gradle file not found")
-          for path in packages:
-              source = path.read_text()
-              if path.name.endswith(".kts"):
-                  updated, count = re.subn(r"compileSdk\s*=\s*33", "compileSdk = 36", source)
-              else:
-                  updated, count = re.subn(r"compileSdkVersion\s*\(?\s*33\s*\)?|compileSdk\s+33", "compileSdkVersion 36", source)
-              if not count:
-                  raise SystemExit(f"Expected compileSdk 33 not found in {path}")
-              path.write_text(updated)
-              print(f"Updated {path}: {count} occurrence(s)")
+          packages = sorted(root.glob("animated_rating_stars-*/android/build.gradle"))
+          if len(packages) != 1:
+              raise SystemExit(f"Expected one rating stars Android Gradle file, found {len(packages)}")
+          path = packages[0]
+          path.write_text("""plugins {
+              id 'com.android.library'
+          }
+          android {
+              namespace 'com.example.animated_rating_stars'
+              compileSdk 36
+              defaultConfig {
+                  minSdk 24
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+          }
+          """)
+          print(f"Replaced legacy Android Gradle configuration in {path}")
           PY
       - name: Build debug APK
         run: flutter build apk --debug
