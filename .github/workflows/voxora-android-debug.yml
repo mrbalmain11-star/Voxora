@@ -40,6 +40,10 @@ jobs:
           PY
       - name: Install dependencies
         run: flutter pub get
+      - name: Accept Android SDK licenses and install NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;27.0.11902837"
       - name: Build debug APK
         run: flutter build apk --debug
       - name: Upload APK
