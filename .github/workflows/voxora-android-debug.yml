@@ -26,13 +26,13 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
           p = Path('pubspec.yaml')
           original = p.read_text()
-          updated, count = re.subn(r'(?ms)^dev_dependencies:\s*\\n.*?(?=^flutter:\s*$)', '', original)
-          if count != 1:
+          start = original.find('dev_dependencies:')
+          end = original.find('\nflutter:', start)
+          if start < 0 or end < 0:
               raise SystemExit('Could not locate dev_dependencies section safely')
-          p.write_text(updated)
+          p.write_text(original[:start] + original[end + 1:])
           print('Excluded development dependencies for CI build only')
           PY
       - name: Install dependencies
